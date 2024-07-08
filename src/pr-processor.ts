@@ -126,7 +126,7 @@ export class PRProcessor {
 
       const millisSinceReview = new Date().getTime() - reviewDate.getTime()
       //const dayInMillis = 1000 * 60 * 60 * 24
-      const dayInMillis = 30; // temporary for testing
+      const dayInMillis = 30 // temporary for testing
 
       if (millisSinceReview <= dayInMillis) {
         core.debug(

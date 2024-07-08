@@ -29340,6 +29340,7 @@ class PRProcessor {
         // Now get all the reviews associated with this PR, so we can see how many
         // approvals we already have.
         const approvals = await this.processPRReviews(pr);
+        console.log(`Got approvals for PR ${pr.number}: ${approvals}`);
         if (approvals.length === 1) {
             // We need to auto-approve!
             console.log(`We need to auto-approve PR ${pr.number}!`);
@@ -29373,7 +29374,8 @@ class PRProcessor {
                 continue;
             }
             const millisSinceReview = new Date().getTime() - reviewDate.getTime();
-            const dayInMillis = 1000 * 60 * 60 * 24;
+            //const dayInMillis = 1000 * 60 * 60 * 24
+            const dayInMillis = 30; // temporary for testing
             if (millisSinceReview <= dayInMillis) {
                 core.debug(`PR review on ${pr.number} (${review.html_url}) is too new (${millisSinceReview} ms vs. required ${dayInMillis} ms), skipping.`);
                 continue;
@@ -29396,11 +29398,12 @@ class PRProcessor {
             // Add to the list of review authors we have seen.
             approvalAuthors.add(review.user.login);
         }
-        console.log(`PR ${pr.number} has sufficiently old approvals from: ${approvalAuthors}.`);
+        console.log(`PR ${pr.number} has sufficiently old approvals from: ${Array.from(approvalAuthors)}.`);
         const result = new Set([
             ...approvalAuthors,
             ...(await this.processPRReviews(pr, page + 1))
         ]);
+        console.log(`Result: ${result}`);
         return Array.from(result);
     }
     async getPRReviews(pr, page) {
