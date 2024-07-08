@@ -29370,8 +29370,10 @@ class PRProcessor {
                 console.log(`PR review on ${pr.number} (${review.html_url}) has no user, skipping.`);
                 continue;
             }
-            // Check to see if the author is a maintainer.
-            if (review.author_association !== 'MEMBER' &&
+            // Check to see if the author is a maintainer.  (Don't apply this check to
+            // github-actions[bot].)
+            if (review.user.login !== 'github-actions[bot]' &&
+                review.author_association !== 'MEMBER' &&
                 review.author_association !== 'OWNER') {
                 console.log(`PR review on ${pr.number} (${review.html_url}) from user ${review.user.login} skipped because of association ${review.author_association}.`);
                 continue;

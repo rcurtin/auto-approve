@@ -156,8 +156,10 @@ export class PRProcessor {
         continue
       }
 
-      // Check to see if the author is a maintainer.
+      // Check to see if the author is a maintainer.  (Don't apply this check to
+      // github-actions[bot].)
       if (
+        review.user.login !== 'github-actions[bot]' &&
         review.author_association !== 'MEMBER' &&
         review.author_association !== 'OWNER'
       ) {
