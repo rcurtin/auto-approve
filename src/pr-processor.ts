@@ -80,6 +80,7 @@ export class PRProcessor {
     // Now get all the reviews associated with this PR, so we can see how many
     // approvals we already have.
     const approvals: string[] = await this.processPRReviews(pr)
+    console.log(`Got approvals for PR ${pr.number}: ${approvals}`)
     if (approvals.length === 1) {
       // We need to auto-approve!
       console.log(`We need to auto-approve PR ${pr.number}!`)
@@ -172,6 +173,7 @@ export class PRProcessor {
       ...approvalAuthors,
       ...(await this.processPRReviews(pr, page + 1))
     ])
+    console.log(`Result: ${result}`)
 
     return Array.from(result)
   }
