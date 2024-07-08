@@ -19,8 +19,6 @@ export class PRProcessor {
     this.options = options
     this.client = getOctokit(this.options.repoToken)
     this.client.log.debug = console.log
-
-    core.debug('Created PRProcessor object.')
   }
 
   /**
@@ -32,7 +30,6 @@ export class PRProcessor {
     const prs: OctokitPR[] = await this.getPRs(page)
 
     if (prs.length <= 0) {
-      core.debug('No more PRs to process.')
       return 0
     }
 
@@ -63,17 +60,17 @@ export class PRProcessor {
   async processPR(pr: OctokitPR): Promise<void> {
     // First rule out some situations where we don't need to auto-approve.
     if (pr.state !== 'open') {
-      core.debug(`PR ${pr.number} is not open, skipping.`)
+      console.log(`PR ${pr.number} is not open, skipping.`)
       return
     }
 
     if (pr.locked === true) {
-      core.debug(`PR ${pr.number} is locked, skipping.`)
+      console.log(`PR ${pr.number} is locked, skipping.`)
       return
     }
 
     if (pr.draft !== false) {
-      core.debug(`PR ${pr.number} is a draft, skipping.`)
+      console.log(`PR ${pr.number} is a draft, skipping.`)
       return
     }
 
@@ -138,7 +135,7 @@ export class PRProcessor {
       const dayInMillis = 30 // temporary for testing
 
       if (millisSinceReview <= dayInMillis) {
-        core.debug(
+        console.log(
           `PR review on ${pr.number} (${review.html_url}) is too new (${millisSinceReview} ms vs. required ${dayInMillis} ms), skipping.`
         )
         continue
@@ -146,14 +143,14 @@ export class PRProcessor {
 
       // Check to see if this is an approval.
       if (review.state !== 'APPROVED') {
-        core.debug(
+        console.log(
           `PR review on ${pr.number} (${review.html_url}) is not an approval, skipping.`
         )
         continue
       }
 
       if (review.user == null) {
-        core.debug(
+        console.log(
           `PR review on ${pr.number} (${review.html_url}) has no user, skipping.`
         )
         continue
@@ -164,7 +161,7 @@ export class PRProcessor {
         review.author_association !== 'MEMBER' &&
         review.author_association !== 'OWNER'
       ) {
-        core.debug(
+        console.log(
           `PR review on ${pr.number} (${review.html_url}) from user ${review.user.login} skipped because of association ${review.author_association}.`
         )
         continue
