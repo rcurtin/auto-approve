@@ -166,7 +166,7 @@ export class PRProcessor {
     }
 
     console.log(
-      `PR ${pr.number} has sufficiently old approvals from: ${approvalAuthors}.`
+      `PR ${pr.number} has sufficiently old approvals from: ${Array.from(approvalAuthors)}.`
     )
 
     const result = new Set<string>([
