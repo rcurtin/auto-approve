@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import { wait } from './wait'
+import { IPRProcessorOptions, PRProcessor } from './pr-processor'
 
 /**
  * The main function for the action.
@@ -9,13 +9,13 @@ export async function run(): Promise<void> {
   try {
     const ms: string = core.getInput('milliseconds')
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    const args: IPRProcessorOptions = {
+      repoToken: core.getInput('repo-token'),
+      approveMessage: 'Auto-approved!'
+    }
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const prProcessor: PRProcessor = new PRProcessor(args)
+    await prProcessor.processPRs()
 
     // Set outputs for other workflow steps to use
     core.setOutput('time', new Date().toTimeString())

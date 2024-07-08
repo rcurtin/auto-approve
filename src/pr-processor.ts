@@ -18,7 +18,7 @@ export class PRProcessor {
     this.options = options
     this.client = getOctokit(this.options.repoToken)
 
-    console.log('Created PRProcessor object.')
+    core.debug('Created PRProcessor object.')
   }
 
   /**
@@ -30,7 +30,7 @@ export class PRProcessor {
     const prs: OctokitPR[] = await this.getPRs(page)
 
     if (prs.length <= 0) {
-      console.log('No more PRs to process.')
+      core.debug('No more PRs to process.')
       return 0
     }
 
