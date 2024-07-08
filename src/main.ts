@@ -11,7 +11,7 @@ export async function run(): Promise<void> {
 
     const args: IPRProcessorOptions = {
       repoToken: core.getInput('repo-token'),
-      approveMessage: 'Auto-approved!'
+      approvalMessage: core.getInput('approval-message')
     }
 
     const prProcessor: PRProcessor = new PRProcessor(args)

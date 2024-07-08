@@ -58,6 +58,8 @@ jobs:
         uses: ./
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          approval-message:
+            'Second approval provided automatically after 24 hours. :+1:'
 
       - name: Print Output
         id: output

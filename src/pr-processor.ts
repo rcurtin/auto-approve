@@ -5,7 +5,7 @@ import { components } from '@octokit/openapi-types'
 
 export interface IPRProcessorOptions {
   repoToken: string
-  approveMessage: string
+  approvalMessage: string
 }
 
 export type OctokitPR = components['schemas']['pull-request-simple']
@@ -83,7 +83,16 @@ export class PRProcessor {
     console.log(`Got approvals for PR ${pr.number}: ${approvals}`)
     if (approvals.length === 1) {
       // We need to auto-approve!
-      console.log(`We need to auto-approve PR ${pr.number}!`)
+      const submitReviewResult = await this.client.rest.pulls.createReview({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        pull_number: pr.number,
+        event: 'APPROVE',
+        body: this.options.approvalMessage
+      })
+      console.log(
+        `Submitted approval for PR ${pr.number}: ${submitReviewResult}.`
+      )
     } else if (approvals.length > 1) {
       console.log(
         `No need to auto-approve PR ${pr.number}; it already has ${approvals} approvals.`
@@ -173,7 +182,6 @@ export class PRProcessor {
       ...approvalAuthors,
       ...(await this.processPRReviews(pr, page + 1))
     ])
-    console.log(`Result: ${result}`)
 
     return Array.from(result)
   }

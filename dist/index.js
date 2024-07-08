@@ -29233,7 +29233,7 @@ async function run() {
         const ms = core.getInput('milliseconds');
         const args = {
             repoToken: core.getInput('repo-token'),
-            approveMessage: 'Auto-approved!'
+            approvalMessage: core.getInput('approval-message')
         };
         const prProcessor = new pr_processor_1.PRProcessor(args);
         await prProcessor.processPRs();
@@ -29343,7 +29343,14 @@ class PRProcessor {
         console.log(`Got approvals for PR ${pr.number}: ${approvals}`);
         if (approvals.length === 1) {
             // We need to auto-approve!
-            console.log(`We need to auto-approve PR ${pr.number}!`);
+            const submitReviewResult = await this.client.rest.pulls.createReview({
+                owner: github_1.context.repo.owner,
+                repo: github_1.context.repo.repo,
+                pull_number: pr.number,
+                event: 'APPROVE',
+                body: this.options.approvalMessage
+            });
+            console.log(`Submitted approval for PR ${pr.number}: ${submitReviewResult}.`);
         }
         else if (approvals.length > 1) {
             console.log(`No need to auto-approve PR ${pr.number}; it already has ${approvals} approvals.`);
@@ -29403,7 +29410,6 @@ class PRProcessor {
             ...approvalAuthors,
             ...(await this.processPRReviews(pr, page + 1))
         ]);
-        console.log(`Result: ${result}`);
         return Array.from(result);
     }
     async getPRReviews(pr, page) {

@@ -6,6 +6,9 @@ inputs:
   repo-token:
     description: 'Github repository token'
     required: true
+  approval-message:
+    description: 'Message to post when approving a PR'
+    required: true
 
 runs:
   using: node20
