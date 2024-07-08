@@ -9,6 +9,7 @@ export interface IPRProcessorOptions {
 }
 
 export type OctokitPR = components['schemas']['pull-request-simple']
+export type OctokitPRReview = components['schemas']['pull-request-review']
 
 export class PRProcessor {
   readonly client: InstanceType<typeof GitHub>
@@ -17,6 +18,7 @@ export class PRProcessor {
   constructor(options: IPRProcessorOptions) {
     this.options = options
     this.client = getOctokit(this.options.repoToken)
+    this.client.log.debug = console.log
 
     core.debug('Created PRProcessor object.')
   }
@@ -53,18 +55,141 @@ export class PRProcessor {
       })
 
       return prResult.data
-
-      //      return prResult.data.map(
-      //        (pr): Issue => new Issue(pr as Readonly<OctokitIssue>)
-      //      )
     } catch (error: any) {
-      throw Error(`Getting PRs was blocked by the error: ${error.message}.`)
+      throw Error(`Getting PRs failed: ${error.message}.`)
     }
   }
 
   async processPR(pr: OctokitPR): Promise<void> {
+    // First rule out some situations where we don't need to auto-approve.
+    if (pr.state !== 'open') {
+      core.debug(`PR ${pr.number} is not open, skipping.`)
+      return
+    }
+
+    if (pr.locked === true) {
+      core.debug(`PR ${pr.number} is locked, skipping.`)
+      return
+    }
+
+    if (pr.draft !== false) {
+      core.debug(`PR ${pr.number} is a draft, skipping.`)
+      return
+    }
+
+    // Now get all the reviews associated with this PR, so we can see how many
+    // approvals we already have.
+    const approvals: string[] = await this.processPRReviews(pr)
+    if (approvals.length === 1) {
+      // We need to auto-approve!
+      console.log(`We need to auto-approve PR ${pr.number}!`)
+    } else if (approvals.length > 1) {
+      console.log(
+        `No need to auto-approve PR ${pr.number}; it already has ${approvals} approvals.`
+      )
+    } else {
+      console.log(`Not auto-approving PR ${pr.number}; it has 0 approvals.`)
+    }
+  }
+
+  isValidDate(date: Readonly<Date>): boolean {
+    if (Object.prototype.toString.call(date) === '[object Date]') {
+      return !isNaN(date.getTime())
+    }
+
+    return false
+  }
+
+  async processPRReviews(
+    pr: OctokitPR,
+    page: Readonly<number> = 1
+  ): Promise<string[]> {
+    // Get the next batch of PR comments.
+    const prReviews: OctokitPRReview[] = await this.getPRReviews(pr, page)
+
+    if (prReviews.length <= 0) {
+      return [] as string[]
+    }
+
+    let approvalAuthors: Set<string> = new Set<string>()
+    for (const review of prReviews.values()) {
+      // If the review is not at least 24 hours old, we don't care.
+      let submittedAtString: string = <string>review.submitted_at
+      const reviewDate: Date = new Date(submittedAtString)
+      if (!this.isValidDate(reviewDate)) {
+        console.log(
+          `Failed to parse PR ${pr.number} review submission date: ${review.submitted_at}; skipping!`
+        )
+        continue
+      }
+
+      const millisSinceReview = new Date().getTime() - reviewDate.getTime()
+      const dayInMillis = 1000 * 60 * 60 * 24
+
+      if (millisSinceReview <= dayInMillis) {
+        core.debug(
+          `PR review on ${pr.number} (${review.html_url}) is too new (${millisSinceReview} ms vs. required ${dayInMillis} ms), skipping.`
+        )
+        continue
+      }
+
+      // Check to see if this is an approval.
+      if (review.state !== 'APPROVED') {
+        core.debug(
+          `PR review on ${pr.number} (${review.html_url}) is not an approval, skipping.`
+        )
+        continue
+      }
+
+      if (review.user == null) {
+        core.debug(
+          `PR review on ${pr.number} (${review.html_url}) has no user, skipping.`
+        )
+        continue
+      }
+
+      // Check to see if the author is a maintainer.
+      if (
+        review.author_association !== 'MEMBER' &&
+        review.author_association !== 'OWNER'
+      ) {
+        core.debug(
+          `PR review on ${pr.number} (${review.html_url}) from user ${review.user.login} skipped because of association ${review.author_association}.`
+        )
+        continue
+      }
+
+      // Add to the list of review authors we have seen.
+      approvalAuthors.add(review.user.login)
+    }
+
     console.log(
-      `Processing PR! ${pr.id}, ${pr.number}, ${pr.state}, ${pr.locked}, ${pr.review_comments_url}`
+      `PR ${pr.number} has sufficiently old approvals from: ${approvalAuthors}.`
     )
+
+    const result = new Set<string>([
+      ...approvalAuthors,
+      ...(await this.processPRReviews(pr, page + 1))
+    ])
+
+    return Array.from(result)
+  }
+
+  async getPRReviews(pr: OctokitPR, page: number): Promise<OctokitPRReview[]> {
+    try {
+      const reviewsResult = await this.client.rest.pulls.listReviews({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        pull_number: pr.number,
+        per_page: 100,
+        page
+      })
+
+      return reviewsResult.data
+    } catch (error: any) {
+      throw Error(
+        `Getting reviews for PR ${pr.number}, page ${page} failed: ${error.message}.`
+      )
+    }
   }
 }
