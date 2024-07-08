@@ -47,6 +47,8 @@ jobs:
   test-action:
     name: GitHub Actions Test
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
 
     steps:
       - name: Checkout
@@ -56,8 +58,6 @@ jobs:
       - name: Test Local Action
         id: test-action
         uses: ./
-        permissions:
-          pull-requests: write
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           approval-message:
