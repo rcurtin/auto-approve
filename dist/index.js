@@ -29356,7 +29356,11 @@ class PRProcessor {
             }
             const millisSinceReview = new Date().getTime() - reviewDate.getTime();
             const dayInMillis = 1000 * 60 * 60 * 24;
-            if (millisSinceReview <= dayInMillis) {
+            // Skip the day-long timeout for reviews by github-actions[bot], so that
+            // we don't accidentally approve twice.
+            if (millisSinceReview <= dayInMillis &&
+                review.user !== null &&
+                review.user.login !== 'github-actions[bot]') {
                 console.log(`PR review on ${pr.number} (${review.html_url}) is too new (${millisSinceReview} ms vs. required ${dayInMillis} ms), skipping.`);
                 continue;
             }
