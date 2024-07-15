@@ -29377,7 +29377,8 @@ class PRProcessor {
             // github-actions[bot].)
             if (review.user.login !== 'github-actions[bot]' &&
                 review.author_association !== 'MEMBER' &&
-                review.author_association !== 'OWNER') {
+                review.author_association !== 'OWNER' &&
+                review.author_association !== 'CONTRIBUTOR') {
                 console.log(`PR review on ${pr.number} (${review.html_url}) from user ${review.user.login} skipped because of association ${review.author_association}.`);
                 continue;
             }
