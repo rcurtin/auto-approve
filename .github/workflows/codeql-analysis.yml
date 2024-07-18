@@ -20,6 +20,9 @@ jobs:
   analyze-auto-approve:
     name: Analyze auto-approve
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./auto-approve
 
     strategy:
       fail-fast: false
@@ -41,17 +44,18 @@ jobs:
 
       - name: Autobuild
         id: autobuild
-        working-directory: ./auto-approve/
         uses: github/codeql-action/autobuild@v3
 
       - name: Perform CodeQL Analysis
         id: analyze
-        working-directory: ./auto-approve/
         uses: github/codeql-action/analyze@v3
 
   analyze-stickers:
     name: Analyze stickers
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./stickers
 
     strategy:
       fail-fast: false
@@ -73,10 +77,8 @@ jobs:
 
       - name: Autobuild
         id: autobuild
-        working-directory: ./stickers/
         uses: github/codeql-action/autobuild@v3
 
       - name: Perform CodeQL Analysis
         id: analyze
-        working-directory: ./stickers/
         uses: github/codeql-action/analyze@v3
