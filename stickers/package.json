@@ -1,7 +1,7 @@
 {
-  "name": "first-interaction-action",
+  "name": "stickers",
   "version": "1.3.0",
-  "description": "An action for greeting first time contributors.",
+  "description": "An action for greeting first time contributors with an offer for stickers.",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -10,21 +10,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/first-interaction.git"
+    "url": "git+https://github.com/rcurtin/actions.git"
   },
   "keywords": [
     "actions",
     "container",
     "toolkit",
     "first",
-    "interaction"
+    "interaction",
+    "stickers"
   ],
-  "author": "GitHub",
+  "author": "Ryan Curtin",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/actions/first-interaction/issues"
+    "url": "https://github.com/rcurtin/actions/issues"
   },
-  "homepage": "https://github.com/actions/first-interaction#readme",
+  "homepage": "https://github.com/rcurtin/actions#readme",
   "dependencies": {
     "@actions/core": "file:toolkit/actions-core-1.10.0.tgz",
     "@actions/exec": "file:toolkit/actions-exec-1.1.1.tgz",
