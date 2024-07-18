@@ -13,7 +13,7 @@ jobs:
   check_for_stickers:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./stickers@main
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
