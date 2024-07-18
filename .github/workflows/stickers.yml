@@ -1,4 +1,6 @@
 name: stickers
+permissions:
+  pull-requests: write
 
 on:
   issues:

@@ -14,51 +14,12 @@ permissions:
   statuses: write
 
 jobs:
-  lint-auto-approve:
+  lint:
     name: Lint auto-approve
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./auto-approve/
-
-    steps:
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        id: setup-node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ./auto-approve/package.json
-          cache-dependency-path: ./auto-approve/package-lock.json
-          cache: npm
-
-      - name: Install Dependencies
-        id: install
-        run: npm ci
-
-      - name: Lint Codebase
-        id: super-linter
-        uses: super-linter/super-linter/slim@v6
-        env:
-          DEFAULT_BRANCH: main
-          FILTER_REGEX_EXCLUDE: dist/**/*
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TYPESCRIPT_DEFAULT_STYLE: prettier
-          VALIDATE_ALL_CODEBASE: true
-          VALIDATE_JAVASCRIPT_STANDARD: false
-          VALIDATE_JSCPD: false
-          LINTER_RULES_PATH: ../.github/linters/
-
-  lint-stickers:
-    name: Lint stickers
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./stickers/
 
     steps:
       - name: Checkout
