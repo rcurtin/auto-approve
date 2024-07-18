@@ -1,4 +1,10 @@
-# mlpack auto-approve action
+# mlpack actions repository
+
+This repository contains Github actions used by the mlpack organization.
+
+## mlpack auto-approve action
+
+`auto-approve/`
 
 This action approves a PR if:
 
@@ -7,3 +13,14 @@ This action approves a PR if:
 
 This is used for mlpack's PR process, where an approved PR has a "waiting
 period" before merge to leave time for other comments.
+
+## mlpack sticker action
+
+`sticker/`
+
+This action posts a comment to an approved PR if it is the user's first
+contribution to the repository.  The comment lets them know that we will mail
+them stickers, and how to get some stickers.
+
+It is based on the
+[first-interaction](https://github.com/actions/first-interaction) action.

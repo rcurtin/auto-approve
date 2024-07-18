@@ -17,8 +17,8 @@ permissions:
   security-events: write
 
 jobs:
-  analyze:
-    name: Analyze
+  analyze-auto-approve:
+    name: Analyze auto-approve
     runs-on: ubuntu-latest
 
     strategy:
@@ -37,12 +37,46 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-          source-root: src
+          source-root: auto-approve/src
 
       - name: Autobuild
         id: autobuild
+        working-directory: ./auto-approve/
         uses: github/codeql-action/autobuild@v3
 
       - name: Perform CodeQL Analysis
         id: analyze
+        working-directory: ./auto-approve/
+        uses: github/codeql-action/analyze@v3
+
+  analyze-stickers:
+    name: Analyze stickers
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language:
+          - TypeScript
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        id: initialize
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          source-root: stickers/src
+
+      - name: Autobuild
+        id: autobuild
+        working-directory: ./stickers/
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        id: analyze
+        working-directory: ./stickers/
         uses: github/codeql-action/analyze@v3
