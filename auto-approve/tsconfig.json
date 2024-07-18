@@ -6,7 +6,7 @@
     "module": "NodeNext",
     "rootDir": "./src",
     "moduleResolution": "NodeNext",
-    "baseUrl": "./",
+    "baseUrl": "./auto-approve/",
     "sourceMap": true,
     "outDir": "./dist",
     "noImplicitAny": true,
