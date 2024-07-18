@@ -7,8 +7,6 @@ import { IPRProcessorOptions, PRProcessor } from './pr-processor'
  */
 export async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-
     const args: IPRProcessorOptions = {
       repoToken: core.getInput('repo-token'),
       approvalMessage: core.getInput('approval-message')

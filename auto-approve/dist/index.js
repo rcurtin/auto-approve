@@ -29230,7 +29230,6 @@ const pr_processor_1 = __nccwpck_require__(6391);
  */
 async function run() {
     try {
-        const ms = core.getInput('milliseconds');
         const args = {
             repoToken: core.getInput('repo-token'),
             approvalMessage: core.getInput('approval-message')
@@ -29345,10 +29344,10 @@ class PRProcessor {
         if (prReviews.length <= 0) {
             return [];
         }
-        let approvalAuthors = new Set();
+        const approvalAuthors = new Set();
         for (const review of prReviews.values()) {
             // If the review is not at least 24 hours old, we don't care.
-            let submittedAtString = review.submitted_at;
+            const submittedAtString = review.submitted_at;
             const reviewDate = new Date(submittedAtString);
             if (!this.isValidDate(reviewDate)) {
                 console.log(`Failed to parse PR ${pr.number} review submission date: ${review.submitted_at}; skipping!`);

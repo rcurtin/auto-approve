@@ -1,4 +1,3 @@
-import * as core from '@actions/core'
 import { context, getOctokit } from '@actions/github'
 import { GitHub } from '@actions/github/lib/utils'
 import { components } from '@octokit/openapi-types'
@@ -118,10 +117,10 @@ export class PRProcessor {
       return [] as string[]
     }
 
-    let approvalAuthors: Set<string> = new Set<string>()
+    const approvalAuthors: Set<string> = new Set<string>()
     for (const review of prReviews.values()) {
       // If the review is not at least 24 hours old, we don't care.
-      let submittedAtString: string = <string>review.submitted_at
+      const submittedAtString: string = review.submitted_at as string
       const reviewDate: Date = new Date(submittedAtString)
       if (!this.isValidDate(reviewDate)) {
         console.log(
