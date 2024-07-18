@@ -15,6 +15,9 @@ jobs:
   test-typescript:
     name: TypeScript Tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./auto-approve
 
     steps:
       - name: Checkout
@@ -24,29 +27,25 @@ jobs:
       - name: Setup Node.js
         id: setup-node
         uses: actions/setup-node@v4
-        working-directory: ./auto-approve/
         with:
-          node-version-file: .node-version
+          node-version-file: ./auto-approve/package.json
+          cache-dependency-file: ./auto-approve/package-lock.json
           cache: npm
 
       - name: Install Dependencies
         id: npm-ci
-        working-directory: ./auto-approve/
         run: npm ci
 
       - name: Check Format
         id: npm-format-check
-        working-directory: ./auto-approve/
         run: npm run format:check
 
       - name: Lint
         id: npm-lint
-        working-directory: ./auto-approve/
         run: npm run lint
 
       - name: Test
         id: npm-ci-test
-        working-directory: ./auto-approve/
         run: npm run ci-test
 
   test-action:
