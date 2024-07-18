@@ -29,7 +29,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: ./auto-approve/package.json
-          cache-dependency-file: ./auto-approve/package-lock.json
+          cache-dependency-path: ./auto-approve/package-lock.json
           cache: npm
 
       - name: Install Dependencies
