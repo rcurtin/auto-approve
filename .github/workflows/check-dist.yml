@@ -24,6 +24,7 @@ jobs:
   check-dist:
     name: Check dist/
     runs-on: ubuntu-latest
+    working-directory: ./auto-approve/
 
     steps:
       - name: Checkout
@@ -33,26 +34,22 @@ jobs:
       - name: Setup Node.js
         id: setup-node
         uses: actions/setup-node@v4
-        working-directory: ./auto-approve/
         with:
           node-version-file: .node-version
           cache: npm
 
       - name: Install Dependencies
         id: install
-        working-directory: ./auto-approve/
         run: npm ci
 
       - name: Build dist/ Directory
         id: build
-        working-directory: ./auto-approve/
         run: npm run bundle
 
       # This will fail the workflow if the `dist/` directory is different than
       # expected.
       - name: Compare Directories
         id: diff
-        working-directory: ./auto-approve/
         run: |
           if [ ! -d dist/ ]; then
             echo "Expected dist/ directory does not exist.  See status below:"
@@ -71,7 +68,6 @@ jobs:
         name: Upload Artifact
         id: upload
         uses: actions/upload-artifact@v4
-        working-directory: ./auto-approve/
         with:
           name: dist
           path: dist/
