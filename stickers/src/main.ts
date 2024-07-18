@@ -1,18 +1,18 @@
-import * as core from '@actions/core';
-import * as github from '@actions/github';
+import * as core from "@actions/core";
+import * as github from "@actions/github";
 
 async function run() {
   try {
-    const issueMessage: string = core.getInput('issue-message');
-    const prMessage: string = core.getInput('pr-message');
+    const issueMessage: string = core.getInput("issue-message");
+    const prMessage: string = core.getInput("pr-message");
     if (!issueMessage && !prMessage) {
       throw new Error(
-        'Action must have at least one of issue-message or pr-message set'
+        "Action must have at least one of issue-message or pr-message set"
       );
     }
     // Get client and context
     const client = github.getOctokit(
-      core.getInput('repo-token', {required: true})
+      core.getInput("repo-token", { required: true })
     );
     const context = github.context;
 
@@ -20,18 +20,19 @@ async function run() {
     const isIssue: boolean = !!context.payload.issue;
     if (!isIssue && !context.payload.pull_request) {
       console.log(
-        'The event that triggered this action was not a pull request or issue, skipping.'
+        "The event that triggered this action was not a pull request or issue, skipping."
       );
       return;
     }
 
     // Do nothing if its not their first contribution
-    console.log('Checking if its the users first contribution');
+    console.log("Checking if its the users first contribution");
     if (!context.payload.sender) {
-      throw new Error('Internal error, no sender provided by GitHub');
+      throw new Error("Internal error, no sender provided by GitHub");
     }
     const sender: string = context.payload.sender!.login;
-    const issue: {owner: string; repo: string; number: number} = context.issue;
+    const issue: { owner: string; repo: string; number: number } =
+      context.issue;
     let firstContribution: boolean = false;
     if (isIssue) {
       firstContribution = await isFirstIssue(
@@ -51,18 +52,18 @@ async function run() {
       );
     }
     if (!firstContribution) {
-      console.log('Not the users first contribution');
+      console.log("Not the users first contribution");
       return;
     }
 
     // Do nothing if no message set for this type of contribution
     const message: string = isIssue ? issueMessage : prMessage;
     if (!message) {
-      console.log('No message provided for this type of contribution');
+      console.log("No message provided for this type of contribution");
       return;
     }
 
-    const issueType: string = isIssue ? 'issue' : 'pull request';
+    const issueType: string = isIssue ? "issue" : "pull request";
     // Add a comment to the appropriate place
     console.log(`Adding message: ${message} to ${issueType} ${issue.number}`);
     if (isIssue) {
@@ -78,7 +79,7 @@ async function run() {
         repo: issue.repo,
         pull_number: issue.number,
         body: message,
-        event: 'COMMENT'
+        event: "COMMENT"
       });
     }
   } catch (error) {
@@ -94,11 +95,11 @@ async function isFirstIssue(
   sender: string,
   curIssueNumber: number
 ): Promise<boolean> {
-  const {status, data: issues} = await client.rest.issues.listForRepo({
+  const { status, data: issues } = await client.rest.issues.listForRepo({
     owner: owner,
     repo: repo,
     creator: sender,
-    state: 'all'
+    state: "all"
   });
 
   if (status !== 200) {
@@ -128,13 +129,15 @@ async function isFirstPull(
   page: number = 1
 ): Promise<boolean> {
   // Provide console output if we loop for a while.
-  console.log(`Checking page ${page} for PR #${curPullNumber} with sender ${sender}...`);
-  const {status, data: pulls} = await client.rest.pulls.list({
+  console.log(
+    `Checking page ${page} for PR #${curPullNumber} with sender ${sender}...`
+  );
+  const { status, data: pulls } = await client.rest.pulls.list({
     owner: owner,
     repo: repo,
     per_page: 100,
     page: page,
-    state: 'all'
+    state: "all"
   });
 
   if (status !== 200) {
@@ -147,9 +150,15 @@ async function isFirstPull(
 
   for (const pull of pulls) {
     const login = pull.user?.login;
-    console.log(`Check PR #${pull.number}, which was done by ${login}.  (Looking for ${sender}, ${pull.number} < ${curPullNumber}, and merge ${pull.merged}.)`)
-    if (login === sender && pull.number < curPullNumber && pull.merged === true) {
-      console.log(`That's a match!`)
+    console.log(
+      `Check PR #${pull.number}, which was done by ${login}.  (Looking for ${sender}, ${pull.number} < ${curPullNumber}, and merge ${pull.merged}.)`
+    );
+    if (
+      login === sender &&
+      pull.number < curPullNumber &&
+      pull.merged === true
+    ) {
+      console.log(`That's a match!`);
       return false;
     }
   }

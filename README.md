@@ -1,6 +1,6 @@
 # mlpack actions repository
 
-This repository contains Github actions used by the mlpack organization.
+This repository contains GitHub Actions used by the mlpack organization.
 
 ## mlpack auto-approve action
 
