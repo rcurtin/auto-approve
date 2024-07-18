@@ -21,7 +21,7 @@ parserOptions:
   sourceType: module
   project:
     - '../.github/linters/tsconfig.json'
-    - './tsconfig.json'
+    - './auto-approve/tsconfig.json'
 
 plugins:
   - jest
