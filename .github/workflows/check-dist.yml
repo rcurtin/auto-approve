@@ -37,7 +37,8 @@ jobs:
         id: setup-node
         uses: actions/setup-node@v4
         with:
-          node-version-file: ./auto-approve/.node-version
+          node-version-file: ./auto-approve/package.json
+          cache-dependency-path: ./auto-approve/package-lock.json
           cache: npm
 
       - name: Install Dependencies
