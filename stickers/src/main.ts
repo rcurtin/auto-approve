@@ -7,12 +7,12 @@ async function run() {
     const prMessage: string = core.getInput("pr-message");
     if (!issueMessage && !prMessage) {
       throw new Error(
-        "Action must have at least one of issue-message or pr-message set"
+        "Action must have at least one of issue-message or pr-message set",
       );
     }
     // Get client and context
     const client = github.getOctokit(
-      core.getInput("repo-token", { required: true })
+      core.getInput("repo-token", { required: true }),
     );
     const context = github.context;
 
@@ -20,7 +20,7 @@ async function run() {
     const isIssue: boolean = !!context.payload.issue;
     if (!isIssue && !context.payload.pull_request) {
       console.log(
-        "The event that triggered this action was not a pull request or issue, skipping."
+        "The event that triggered this action was not a pull request or issue, skipping.",
       );
       return;
     }
@@ -40,7 +40,7 @@ async function run() {
         issue.owner,
         issue.repo,
         sender,
-        issue.number
+        issue.number,
       );
     } else {
       firstContribution = await isFirstPull(
@@ -48,7 +48,7 @@ async function run() {
         issue.owner,
         issue.repo,
         sender,
-        issue.number
+        issue.number,
       );
     }
     if (!firstContribution) {
@@ -71,7 +71,7 @@ async function run() {
         owner: issue.owner,
         repo: issue.repo,
         issue_number: issue.number,
-        body: message
+        body: message,
       });
     } else {
       await client.rest.pulls.createReview({
@@ -79,7 +79,7 @@ async function run() {
         repo: issue.repo,
         pull_number: issue.number,
         body: message,
-        event: "COMMENT"
+        event: "COMMENT",
       });
     }
   } catch (error) {
@@ -93,13 +93,13 @@ async function isFirstIssue(
   owner: string,
   repo: string,
   sender: string,
-  curIssueNumber: number
+  curIssueNumber: number,
 ): Promise<boolean> {
   const { status, data: issues } = await client.rest.issues.listForRepo({
     owner: owner,
     repo: repo,
     creator: sender,
-    state: "all"
+    state: "all",
   });
 
   if (status !== 200) {
@@ -126,18 +126,18 @@ async function isFirstPull(
   repo: string,
   sender: string,
   curPullNumber: number,
-  page: number = 1
+  page: number = 1,
 ): Promise<boolean> {
   // Provide console output if we loop for a while.
   console.log(
-    `Checking page ${page} for PR #${curPullNumber} with sender ${sender}...`
+    `Checking page ${page} for PR #${curPullNumber} with sender ${sender}...`,
   );
   const { status, data: pulls } = await client.rest.pulls.list({
     owner: owner,
     repo: repo,
     per_page: 100,
     page: page,
-    state: "all"
+    state: "all",
   });
 
   if (status !== 200) {
@@ -151,7 +151,7 @@ async function isFirstPull(
   for (const pull of pulls) {
     const login = pull.user?.login;
     console.log(
-      `Check PR #${pull.number}, which was done by ${login}.  (Looking for ${sender}, ${pull.number} < ${curPullNumber}, and merge ${pull.merged}.)`
+      `Check PR #${pull.number}, which was done by ${login}.  (Looking for ${sender}, ${pull.number} < ${curPullNumber}, and merge ${pull.merged}.)`,
     );
     if (
       login === sender &&
@@ -169,7 +169,7 @@ async function isFirstPull(
     repo,
     sender,
     curPullNumber,
-    page + 1
+    page + 1,
   );
 }
 
