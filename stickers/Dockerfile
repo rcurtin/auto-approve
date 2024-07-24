@@ -1,8 +1,10 @@
 FROM node:20.10-buster-slim
 
-WORKDIR /
-COPY . .
+USER root
+RUN useradd -m node
+WORKDIR /home/node/
 USER node
+COPY . .
 
 RUN npm install --production
 
