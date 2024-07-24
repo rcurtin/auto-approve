@@ -16,7 +16,7 @@ period" before merge to leave time for other comments.
 
 ## mlpack sticker action
 
-`sticker/`
+`stickers/`
 
 This action posts a comment to an approved PR if it is the user's first
 contribution to the repository.  The comment lets them know that we will mail
